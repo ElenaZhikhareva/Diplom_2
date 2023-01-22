@@ -80,8 +80,8 @@ public class OrderCreationTests {
     @DisplayName("Создание заказа с неверным хешем ингредиентов.")
     public void createOrderWithInvalidIngTest() {
         List<String> ingredients = new ArrayList<>();
-        ingredients.add("25896631");
-        ingredients.add("1478963");
+        ingredients.add("1111111");
+        ingredients.add("1234567");
         order = new Order(ingredients);
         ValidatableResponse response = orderResponse.createOrder(order);
         int statusCode = response.extract().statusCode();
