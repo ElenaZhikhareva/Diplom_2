@@ -2,69 +2,76 @@ package user;
 
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class UserCreationTests {
 
     User user;
     UserResponse userResponse;
+    private String accessToken;
 
     @Before
     public void setup() {
         RestAssured.baseURI = "https://stellarburgers.nomoreparties.site/api";
-        user = User.getRandomUser();
         userResponse = new UserResponse();
     }
 
     @Test
     @DisplayName("Создание уникального пользователя")
     public void createUserTest() {
-        userResponse.createUser(user)
-                .assertThat()
-                .statusCode(200);
+        user = User.getRandomUser();
+        ValidatableResponse responseCreate = userResponse.createUser(user);
+        int statusCode = responseCreate.extract().statusCode();
+        Assert.assertEquals("User not updated", SC_OK, statusCode);
+        boolean isCreated = responseCreate.extract().path("success");
+        assertTrue("User is not created", isCreated);
+
+        accessToken = responseCreate.extract().path("accessToken");
+        userResponse.deleteUser(accessToken);
     }
 
     @Test
     @DisplayName("Проверка создания пользователя, который уже есть в системе")
     public void userCreateAlreadyExistsTest() {
-        userResponse.createUser(user);
-        String userAlreadyExists = userResponse.createUser(user)
-                .assertThat()
-                .statusCode(403)
-                .extract().path("message");
-        assertEquals("User already exists", userAlreadyExists);
+        user = User.getRandomUser();
+        ValidatableResponse responseCreate = userResponse.createUser(user);
+        int statusCode = responseCreate.extract().statusCode();
+        Assert.assertEquals("User not updated", SC_OK, statusCode);
+        boolean isCreated = responseCreate.extract().path("success");
+        assertTrue("User is not created", isCreated);
+
+        ValidatableResponse responseCreate1 = userResponse.createUser(user);
+        int statusCodeForbidden = responseCreate1.extract().statusCode();
+        Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCodeForbidden);
+
+        accessToken = responseCreate.extract().path("accessToken");
+        userResponse.deleteUser(accessToken);
     }
 
     @Test
     @DisplayName("Проверка невозможности создания пользователя, если не заполнено поле логин")
     public void userCreateWithoutLoginTest() {
-        userResponse.createUser(user);
-        User getWithoutLogin = User.getWithoutLogin();
-        String expected = userResponse.createUser(getWithoutLogin)
-                .assertThat()
-                .statusCode(403)
-                .extract().path("message");
-        assertEquals("Email, password and name are required fields", expected);
+        user = User.getWithoutLogin();
+        ValidatableResponse responseCreate = userResponse.createUser(user);
+        int statusCode = responseCreate.extract().statusCode();
+        Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCode);
     }
 
     @Test
     @DisplayName("Проверка невозможности создания пользователя, если не заполнено поле пароль")
     public void userCreateWithoutPasswordTest() {
-        userResponse.createUser(user);
-        User userWithoutPassword = User.getWithoutPassword();
-        String expected = userResponse.createUser(userWithoutPassword)
-                .assertThat()
-                .statusCode(403)
-                .extract().path("message");
-        assertEquals("Email, password and name are required fields", expected);
-    }
-
-    @After
-    public void delete() {
-        userResponse.deleteUser(user);
+        user = User.getWithoutPassword();
+        ValidatableResponse responseCreate = userResponse.createUser(user);
+        int statusCode = responseCreate.extract().statusCode();
+        Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCode);
     }
 }

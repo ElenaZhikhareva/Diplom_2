@@ -14,7 +14,7 @@ public class UserCredentials {
     }
 
     public static UserCredentials getWrongLoginPassword(User user) {
-        return new UserCredentials("пользователь_тест", "пароль_тест");
+        return new UserCredentials("123@gmail.com", "123");
     }
 
     public String getEmail() {

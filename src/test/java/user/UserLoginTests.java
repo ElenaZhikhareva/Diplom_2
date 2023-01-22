@@ -37,8 +37,8 @@ public class UserLoginTests {
         assertEquals("email or password are incorrect", massage);
     }
 
-    @After
+/*    @After
     public void delete() {
         userResponse.deleteUser(user);
-    }
+    }*/
 }

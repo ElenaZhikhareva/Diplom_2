@@ -2,10 +2,13 @@ package user;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+
+
 public class User {
     private String email;
     private String password;
     private String name;
+    private String accessToken;
 
     public User(String email, String password, String name) {
         this.email = email;
@@ -13,8 +16,13 @@ public class User {
         this.name = name;
     }
 
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public static User getRandomUser() {
-        return new User(RandomStringUtils.randomAlphabetic(5) + "@ru.ru", "pass", RandomStringUtils.randomAlphabetic(10));
+        return new User(RandomStringUtils.randomAlphabetic(5) + "@ru.ru", "12345678", RandomStringUtils.randomAlphabetic(10));
     }
 
     public static User getWithoutLogin() {
@@ -36,6 +44,9 @@ public class User {
     public String getName() {
         return name;
     }
+    public String getAccessToken() {
+        return accessToken;
+    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -47,6 +58,10 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
 }

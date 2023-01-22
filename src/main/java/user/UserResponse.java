@@ -7,17 +7,15 @@ import io.restassured.response.ValidatableResponse;
 import static io.restassured.RestAssured.given;
 
 public class UserResponse extends Config {
-    private final String REGISTER = "/auth/register";
-    private final String LOGIN = "/auth/login ";
-    private final String USER = "/auth/user ";
-    private final String ORDERS = "/orders ";
-    private final String INGREDIENTS = "/ingredients ";
+    private final String REGISTER = "/api/auth/register";
+    private final String LOGIN = "/api/auth/login ";
+    private final String USER = "/api/auth/user ";
+
 
     @Step("Создание пользователя")
     public ValidatableResponse createUser(User user) {
         return given()
-                .header("Content-type", "application/json")
-                .and()
+                .spec(getSpec())
                 .body(user)
                 .when()
                 .post(REGISTER)
@@ -27,8 +25,7 @@ public class UserResponse extends Config {
     @Step("Логин пользователя")
     public ValidatableResponse loginUser(UserCredentials userCredentials) {
         return given()
-                .header("Content-type", "application/json")
-                .and()
+                .spec(getSpec())
                 .body(userCredentials)
                 .when()
                 .post(LOGIN)
@@ -51,24 +48,27 @@ public class UserResponse extends Config {
     public ValidatableResponse updateUserWithoutAuthorization(User user) {
         return given()
                 .spec(getSpec())
-                .log().all()
                 .body(user)
                 .patch(USER)
-                .then()
-                .log().all();
+                .then();
     }
 
     @Step("Удаление пользователя")
-    public ValidatableResponse deleteUser(User user) {
-        UserCredentials creds = UserCredentials.from(user);
-        String token = loginUser(creds).extract().path("accessToken");
+    public ValidatableResponse deleteUser(String accessToken) {
         return given()
-                .header("Content-Type", "application/json")
-                .baseUri(Config.BASE_URL)
-                .body(user)
-                .auth().oauth2(token.substring(7))
+                .spec(getSpec())
+                .header("Authorization", accessToken)
                 .when()
                 .delete(USER)
                 .then();
+    }
+
+    public ValidatableResponse userGetInfo(User user) {
+        return given().log().all()
+                .spec(getSpec())
+                .header("Authorization", user.getAccessToken())
+                .when()
+                .get(USER)
+                .then().log().all();
     }
 }
