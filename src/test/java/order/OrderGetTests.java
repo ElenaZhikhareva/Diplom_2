@@ -1,7 +1,7 @@
 package order;
 
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import user.User;
@@ -17,11 +17,8 @@ import static org.junit.Assert.assertTrue;
 import static user.User.getRandomUser;
 
 public class OrderGetTests {
-    private User user;
     private Order order;
-    private UserResponse userResponse;
     private OrderResponse orderResponse;
-    private String accessToken;
 
     @Before
     public void setUp() {
@@ -29,13 +26,14 @@ public class OrderGetTests {
     }
 
     @Test
+    @DisplayName("Получение заказа с авторизацией")
     public void getOrdersWithAuthTest() {
-        userResponse = new UserResponse();
-        user = getRandomUser();
+        UserResponse userResponse = new UserResponse();
+        User user = getRandomUser();
         ValidatableResponse responseUser = userResponse.createUser(user);
         int status = responseUser.extract().statusCode();
         assertEquals(SC_OK, status);
-        accessToken = responseUser.extract().path("accessToken");
+        String accessToken = responseUser.extract().path("accessToken");
 
         ValidatableResponse response = orderResponse.getIngredients();
         List<String> ingredients = new ArrayList<>();
@@ -56,6 +54,7 @@ public class OrderGetTests {
     }
 
     @Test
+    @DisplayName("Получение заказа без авторизации")
     public void getOrdersWithoutAuthTest() {
         ValidatableResponse response = orderResponse.getIngredients();
         List<String> ingredients = new ArrayList<>();
@@ -72,5 +71,4 @@ public class OrderGetTests {
         String message = getResponse.extract().path("message");
         assertEquals("You should be authorised", message);
     }
-
 }

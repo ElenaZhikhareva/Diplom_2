@@ -62,13 +62,4 @@ public class UserResponse extends Config {
                 .delete(USER)
                 .then();
     }
-
-    public ValidatableResponse userGetInfo(User user) {
-        return given().log().all()
-                .spec(getSpec())
-                .header("Authorization", user.getAccessToken())
-                .when()
-                .get(USER)
-                .then().log().all();
-    }
 }

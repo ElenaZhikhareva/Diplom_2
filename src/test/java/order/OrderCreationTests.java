@@ -1,7 +1,7 @@
 package order;
 
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import user.User;
@@ -17,18 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static user.User.getRandomUser;
 
-
 public class OrderCreationTests {
-    private User user;
     private Order order;
-    private UserResponse userResponse;
     private OrderResponse orderResponse;
-    private String accessToken;
 
-        @Before
-        public void setUp() {
-            orderResponse = new OrderResponse();
-        }
+    @Before
+    public void setUp() {
+        orderResponse = new OrderResponse();
+    }
+
+    @DisplayName("Создание заказа без авторизации")
     @Test
     public void createOrderWithoutAuthTest() {
         ValidatableResponse response = orderResponse.getIngredients();
@@ -41,17 +39,17 @@ public class OrderCreationTests {
         assertEquals(SC_OK, statusCode);
         boolean isCreate = response.extract().path("success");
         assertTrue("Order is not created", isCreate);
-
     }
 
+    @DisplayName("Создание заказа с авторизацией, с ингридиентами")
     @Test
     public void createOrderWithAuthTest() {
-        userResponse = new UserResponse();
-        user = getRandomUser();
+        UserResponse userResponse = new UserResponse();
+        User user = getRandomUser();
         ValidatableResponse responseUser = userResponse.createUser(user);
         int status = responseUser.extract().statusCode();
         assertEquals(SC_OK, status);
-        accessToken = responseUser.extract().path("accessToken");
+        String accessToken = responseUser.extract().path("accessToken");
 
         ValidatableResponse response = orderResponse.getIngredients();
         List<String> ingredients = new ArrayList<>();
@@ -64,10 +62,10 @@ public class OrderCreationTests {
         assertEquals(SC_OK, statusCode);
         String order = responseOrder.extract().body().asString();
         assertThat(order, containsString("status"));
-        userResponse.deleteUser(accessToken);
     }
 
     @Test
+    @DisplayName("Создание заказа с авторизацией, без ингридиентами")
     public void createOrderWithoutIngredientsTest() {
         List<String> ingredients = new ArrayList<>();
         order = new Order(ingredients);
@@ -77,7 +75,9 @@ public class OrderCreationTests {
         String message = response.extract().path("message");
         assertEquals("Ingredient ids must be provided", message);
     }
+
     @Test
+    @DisplayName("Создание заказа с неверным хешем ингредиентов.")
     public void createOrderWithInvalidIngTest() {
         List<String> ingredients = new ArrayList<>();
         ingredients.add("25896631");
@@ -87,6 +87,4 @@ public class OrderCreationTests {
         int statusCode = response.extract().statusCode();
         assertEquals(SC_INTERNAL_SERVER_ERROR, statusCode);
     }
-
-
-    }
+}

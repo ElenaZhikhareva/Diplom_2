@@ -9,7 +9,6 @@ import static io.restassured.RestAssured.given;
 public class OrderResponse extends Config {
     private static final String GET_INGREDIENTS = "/api/ingredients";
     private static final String ORDER_CREATE = "/api/orders";
-    public static final String ALL_ORDERS = "api/orders/all";
 
     @Step("Получение списка ингридиентов")
     public ValidatableResponse getIngredients() {
@@ -31,7 +30,7 @@ public class OrderResponse extends Config {
     }
 
     @Step("Создание заказа с авторизацией")
-    public ValidatableResponse createOrderByAuthorization(String accessToken,  Order order) {
+    public ValidatableResponse createOrderByAuthorization(String accessToken, Order order) {
         return given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
@@ -39,6 +38,7 @@ public class OrderResponse extends Config {
                 .post(ORDER_CREATE)
                 .then();
     }
+
     @Step("Создание заказа без авторизации")
     public ValidatableResponse createOrderWithoutAuthorization(Order order) {
         return given()

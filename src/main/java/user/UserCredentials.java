@@ -13,7 +13,7 @@ public class UserCredentials {
         return new UserCredentials(user.getEmail(), user.getPassword());
     }
 
-    public static UserCredentials getWrongLoginPassword(User user) {
+    public static UserCredentials getWrongLoginPassword() {
         return new UserCredentials("123@gmail.com", "123");
     }
 

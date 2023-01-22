@@ -3,10 +3,9 @@ package user;
 import org.apache.commons.lang3.RandomStringUtils;
 
 
-
 public class User {
-    private String email;
-    private String password;
+    private final String email;
+    private final String password;
     private String name;
     private String accessToken;
 
@@ -14,11 +13,6 @@ public class User {
         this.email = email;
         this.password = password;
         this.name = name;
-    }
-
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
     }
 
     public static User getRandomUser() {
@@ -44,16 +38,9 @@ public class User {
     public String getName() {
         return name;
     }
+
     public String getAccessToken() {
         return accessToken;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void setName(String name) {

@@ -2,7 +2,6 @@ package user;
 
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,13 +31,8 @@ public class UserLoginTests {
     @Test
     @DisplayName("Проверка того, что нельзя залогиниться с неверным логином и паролем")
     public void userloginTestWrongLoginPassword() {
-        UserCredentials creds = UserCredentials.getWrongLoginPassword(user);
+        UserCredentials creds = UserCredentials.getWrongLoginPassword();
         String massage = userResponse.loginUser(creds).extract().path("message");
         assertEquals("email or password are incorrect", massage);
     }
-
-/*    @After
-    public void delete() {
-        userResponse.deleteUser(user);
-    }*/
 }
