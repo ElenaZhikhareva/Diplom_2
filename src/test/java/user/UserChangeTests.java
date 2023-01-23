@@ -44,8 +44,6 @@ public class UserChangeTests {
     @Test
     @DisplayName("Изменение данных пользователя: без авторизации")
     public void updateUserDataWithoutAuth() {
-        ValidatableResponse responseCreate = userResponse.createUser(user);
-        accessToken = responseCreate.extract().path("accessToken");
         String userUpdateName = user.getName() + "new2";
         user.setName(userUpdateName);
         ValidatableResponse responseUpdate = userResponse.updateUserWithoutAuthorization(user);
@@ -57,6 +55,8 @@ public class UserChangeTests {
 
     @After
     public void delete() {
-        userResponse.deleteUser(accessToken);
+        if (accessToken != null) {
+            userResponse.deleteUser(accessToken);
+        }
     }
 }

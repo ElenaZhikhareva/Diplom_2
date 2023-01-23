@@ -71,9 +71,6 @@
                 <version>2.22.2</version>
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
-                    <argLine>
-                        -javaagent:"C:/Users/elenk/.m2/repository/org/aspectj/aspectjweaver/1.9.9/aspectjweaver-1.9.9.jar"
-                    </argLine>
                     <properties>
                         <property>
                             <name>listener</name>
@@ -84,7 +81,7 @@
                         <property>
                             <!-- папка, в которую будут генерироваться отчёты Allure -->
                             <name>allure.results.directory</name>
-                            <value>C:/Users/elenk/IdeaProjects/Diplom/Diplom_2/target/allure-results</value>
+                            <value>${project.build.directory}/allure-results</value>
                         </property>
                     </systemProperties>
                 </configuration>

@@ -7,13 +7,12 @@ import io.restassured.response.ValidatableResponse;
 import static io.restassured.RestAssured.given;
 
 public class UserResponse extends Config {
-    private final String REGISTER = "/api/auth/register";
-    private final String LOGIN = "/api/auth/login ";
     private final String USER = "/api/auth/user ";
 
 
     @Step("Создание пользователя")
     public ValidatableResponse createUser(User user) {
+        String REGISTER = "/api/auth/register";
         return given()
                 .spec(getSpec())
                 .body(user)
@@ -24,6 +23,7 @@ public class UserResponse extends Config {
 
     @Step("Логин пользователя")
     public ValidatableResponse loginUser(UserCredentials userCredentials) {
+        String LOGIN = "/api/auth/login ";
         return given()
                 .spec(getSpec())
                 .body(userCredentials)
@@ -36,12 +36,10 @@ public class UserResponse extends Config {
     public ValidatableResponse updateUserWithAuthorization(User user, String accessToken) {
         return given()
                 .spec(getSpec())
-                .log().all()
                 .header("Authorization", accessToken)
                 .body(user)
                 .patch(USER)
-                .then()
-                .log().all();
+                .then();
     }
 
     @Step("Изменение данных пользователя без авторизации")
@@ -54,8 +52,8 @@ public class UserResponse extends Config {
     }
 
     @Step("Удаление пользователя")
-    public ValidatableResponse deleteUser(String accessToken) {
-        return given()
+    public void deleteUser(String accessToken) {
+        given()
                 .spec(getSpec())
                 .header("Authorization", accessToken)
                 .when()

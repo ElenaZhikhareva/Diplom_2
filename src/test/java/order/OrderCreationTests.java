@@ -2,6 +2,7 @@ package order;
 
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import user.User;
@@ -15,15 +16,22 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static user.User.getRandomUser;
 
 public class OrderCreationTests {
     private Order order;
     private OrderResponse orderResponse;
+    private String accessToken;
+    User user;
+    UserResponse userResponse;
+
 
     @Before
     public void setUp() {
         orderResponse = new OrderResponse();
+        user = User.getRandomUser();
+        userResponse = new UserResponse();
+        ValidatableResponse responseUser = userResponse.createUser(user);
+        accessToken = responseUser.extract().path("accessToken");
     }
 
     @DisplayName("Создание заказа без авторизации")
@@ -33,7 +41,7 @@ public class OrderCreationTests {
         List<String> ingredients = new ArrayList<>();
         ingredients.add(response.extract().path("data[0]._id"));
         ingredients.add(response.extract().path("data[3]._id"));
-        order = new Order(ingredients);
+        Order order = new Order(ingredients);
         ValidatableResponse responseOr = orderResponse.createOrderWithoutAuthorization(order);
         int statusCode = responseOr.extract().statusCode();
         assertEquals(SC_OK, statusCode);
@@ -44,13 +52,6 @@ public class OrderCreationTests {
     @DisplayName("Создание заказа с авторизацией, с ингридиентами")
     @Test
     public void createOrderWithAuthTest() {
-        UserResponse userResponse = new UserResponse();
-        User user = getRandomUser();
-        ValidatableResponse responseUser = userResponse.createUser(user);
-        int status = responseUser.extract().statusCode();
-        assertEquals(SC_OK, status);
-        String accessToken = responseUser.extract().path("accessToken");
-
         ValidatableResponse response = orderResponse.getIngredients();
         List<String> ingredients = new ArrayList<>();
         ingredients.add(response.extract().path("data[2]._id"));
@@ -86,5 +87,12 @@ public class OrderCreationTests {
         ValidatableResponse response = orderResponse.createOrder(order);
         int statusCode = response.extract().statusCode();
         assertEquals(SC_INTERNAL_SERVER_ERROR, statusCode);
+    }
+
+    @After
+    public void delete() {
+        if (accessToken != null) {
+            userResponse.deleteUser(accessToken);
+        }
     }
 }

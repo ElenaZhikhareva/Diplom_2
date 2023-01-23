@@ -3,6 +3,7 @@ package user;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +30,10 @@ public class UserCreationTests {
         user = User.getRandomUser();
         ValidatableResponse responseCreate = userResponse.createUser(user);
         int statusCode = responseCreate.extract().statusCode();
+        accessToken = responseCreate.extract().path("accessToken");
         Assert.assertEquals("User not updated", SC_OK, statusCode);
         boolean isCreated = responseCreate.extract().path("success");
         assertTrue("User is not created", isCreated);
-
-        accessToken = responseCreate.extract().path("accessToken");
-        userResponse.deleteUser(accessToken);
     }
 
     @Test
@@ -43,6 +42,7 @@ public class UserCreationTests {
         user = User.getRandomUser();
         ValidatableResponse responseCreate = userResponse.createUser(user);
         int statusCode = responseCreate.extract().statusCode();
+        accessToken = responseCreate.extract().path("accessToken");
         Assert.assertEquals("User not updated", SC_OK, statusCode);
         boolean isCreated = responseCreate.extract().path("success");
         assertTrue("User is not created", isCreated);
@@ -50,9 +50,6 @@ public class UserCreationTests {
         ValidatableResponse responseCreate1 = userResponse.createUser(user);
         int statusCodeForbidden = responseCreate1.extract().statusCode();
         Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCodeForbidden);
-
-        accessToken = responseCreate.extract().path("accessToken");
-        userResponse.deleteUser(accessToken);
     }
 
     @Test
@@ -60,6 +57,7 @@ public class UserCreationTests {
     public void userCreateWithoutLoginTest() {
         user = User.getWithoutLogin();
         ValidatableResponse responseCreate = userResponse.createUser(user);
+        accessToken = responseCreate.extract().path("accessToken");
         int statusCode = responseCreate.extract().statusCode();
         Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCode);
     }
@@ -69,7 +67,15 @@ public class UserCreationTests {
     public void userCreateWithoutPasswordTest() {
         user = User.getWithoutPassword();
         ValidatableResponse responseCreate = userResponse.createUser(user);
+        accessToken = responseCreate.extract().path("accessToken");
         int statusCode = responseCreate.extract().statusCode();
         Assert.assertEquals("User not updated", SC_FORBIDDEN, statusCode);
+    }
+
+    @After
+    public void delete() {
+        if (accessToken != null) {
+            userResponse.deleteUser(accessToken);
+        }
     }
 }
